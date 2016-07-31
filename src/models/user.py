@@ -6,20 +6,36 @@ class User(object):
         self.email = email
         self.password = password
 
-    def get_by_email():
-        data = Database.find_one("users", {"email": self.email})
+    @classmethod
+    def get_by_email(cls, email):
+        data = Database.find_one("users", {"email": email})
         if data is not None:
             return cls(**data)
 
-    def get_by_id(self):
-        pass
+    @classmethod
+    def get_by_id(cls, _id):
+        data = Database.find_one("users", {"_id": _id})
+        if data is not None:
+            return cls(**data)
 
-    def login_valid(self):
+    @staticmethod
+    def login_valid(email, password):
         # Check wheter a user's email matches the password they sent us
-        pass
+        user = User.get_by_email(email)
+        if user is not None:
+            return user.password == password
+        return False
 
-    def register(self):
-        pass
+    @classmethod
+    def register(cls, email, password):
+        user = cls.get_by_email(email)
+        if user is None:
+            new_user = User(email, password)
+            new_user.save_to_mongo()
+            return True
+        else:
+            # User exists
+            return False
 
     def login(self):
         pass
